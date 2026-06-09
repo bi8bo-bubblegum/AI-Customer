@@ -7,5 +7,5 @@ llm = ChatOpenAI(
         api_key=settings.LLM_API_KEY,
         base_url=settings.LLM_BASE_URL,
         temperature=0,
-        extra_body={"thinking": {"type": "enabled"}}
+        extra_body={"thinking": {"type": "disabled"}}
     )

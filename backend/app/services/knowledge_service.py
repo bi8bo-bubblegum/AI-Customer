@@ -1,6 +1,8 @@
 import os
+import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from langchain_openai import OpenAIEmbeddings
+from app.common.exceptions import NotFoundException, ValidationException
 from app.repositories.knowledge_repo import KnowledgeDocumentRepo, KnowledgeChunkRepo
 from app.utils.pdf_parser import extract_text_from_pdf, split_text
 from app.models.knowledge import KnowledgeChunk, KnowledgeDocument
@@ -28,7 +30,7 @@ class KnowledgeService:
         # 1. 解析 PDF
         text = extract_text_from_pdf(file_path)
         if not text.strip():
-            raise ValueError("PDF 文件内容为空或无法解析")
+            raise ValidationException("PDF 文件内容为空或无法解析")
 
         # 2. 切片
         docs = split_text(text, metadata={"file_name": file_name, "title": title})
@@ -43,7 +45,7 @@ class KnowledgeService:
             title=title,
             file_name=file_name,
             file_path=file_path,
-            uploaded_by=user_id,
+            uploaded_by=uuid.UUID(str(user_id)),
             chunk_count=len(docs),
         )
         doc_record = await KnowledgeDocumentRepo.create(db, doc_record)
@@ -71,7 +73,7 @@ class KnowledgeService:
     async def delete_document(db: AsyncSession, doc_id: str):
         doc = await KnowledgeDocumentRepo.get_by_id(db, doc_id)
         if not doc:
-            raise ValueError("文档不存在")
+            raise NotFoundException("文档不存在")
 
         # 删除文件
         if os.path.exists(doc.file_path):

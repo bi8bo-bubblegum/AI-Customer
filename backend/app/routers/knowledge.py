@@ -7,6 +7,7 @@ from app.common.dependencies import require_admin
 from app.common.response import success
 from app.common.exceptions import ValidationException
 from app.models.user import User
+from app.schemas.knowledge import KnowledgeDocumentResponse
 from app.services.knowledge_service import KnowledgeService
 from app.config import settings
 
@@ -50,7 +51,7 @@ async def get_documents(
     db: AsyncSession = Depends(get_db),
 ):
     docs = await KnowledgeService.get_documents(db)
-    return success(data=[doc.__dict__ for doc in docs])
+    return success(data=[KnowledgeDocumentResponse.model_validate(d).model_dump() for d in docs])
 
 
 @router.delete("/documents/{doc_id}")

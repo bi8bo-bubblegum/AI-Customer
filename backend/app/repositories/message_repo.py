@@ -24,7 +24,8 @@ class MessageRepo:
         return list(result.scalars().all())
 
     @staticmethod
-    async def delete_by_user(db: AsyncSession, user_id: str):
+    async def delete_by_user(db: AsyncSession, user_id: str) -> int:
         sql = delete(Message).where(Message.user_id == user_id)
-        await db.execute(sql)
+        result = await db.execute(sql)
         await db.flush()
+        return result.rowcount

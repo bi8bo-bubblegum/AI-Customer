@@ -221,3 +221,6 @@ __marimo__/
 .trae
 docs/*
 backend/.env
+backend/uploads/
+frontend/node_modules
+frontend/dist

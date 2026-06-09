@@ -22,5 +22,5 @@ def split_text(text: str, metadata: dict = None) -> List[Document]:
         chunk_overlap=settings.RAG_CHUNK_OVERLAP,
         separators=["\n\n", "\n", "。", "！", "？", ".", "!", "?", " ", ""]
     )
-    docs = splitter.create_documents([text], metadata=[metadata or {}])
+    docs = splitter.create_documents([text], metadatas=[metadata or {}])
     return docs

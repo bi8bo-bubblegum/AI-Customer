@@ -1,3 +1,4 @@
+import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.work_order_repo import WorkOrderRepo
 from app.common.exceptions import NotFoundException, ForbiddenException
@@ -6,10 +7,10 @@ from app.models.user import User
 
 class WorkOrderService:
     @staticmethod
-    async def create_work_order(db: AsyncSession, user_id: str, title: str, description: str, category: str) -> dict:
+    async def create_work_order(db: AsyncSession, user_id, title: str, description: str, category: str) -> dict:
         order = await WorkOrderRepo.create(
             db,
-            user_id=user_id,
+            user_id=uuid.UUID(str(user_id)),
             title=title,
             description=description,
             category=category,

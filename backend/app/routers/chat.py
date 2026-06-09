@@ -32,14 +32,19 @@ async def get_messages(
     db: AsyncSession = Depends(get_db),
 ):
     messages = await ChatService.get_messages(db, current_user.id, limit, offset)
-    return success(data=messages.model_dump())
+    return success(data=[msg.model_dump() for msg in messages])
 
 
 @router.delete("/messages")
 async def clear_history(
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    # 清理聊天记录
     cleared = await ChatService.clear_history(db, current_user.id)
+    # 同步清理 LangGraph checkpoint（上下文）
+    checkpointer: AsyncPostgresSaver = request.app.state.checkpointer
+    await ChatService.clear_checkpoint(checkpointer, str(current_user.id))
     return success(data={"cleared": cleared})
 
