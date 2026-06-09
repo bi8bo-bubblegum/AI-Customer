@@ -1,0 +1,11 @@
+from typing import TypedDict, Annotated
+
+from langchain_core.messages import AnyMessage
+from langgraph.graph import add_messages
+
+
+class AgentState(TypedDict):
+    messages: Annotated[list[AnyMessage], add_messages]
+    user_id: str
+    intent: str
+    current_agent: str

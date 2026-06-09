@@ -2,17 +2,22 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 
 from app.common.exception_handlers import generic_exception_handler, business_exception_handler, \
     validation_exception_handler
 from app.common.exceptions import BusinessException
+from app.config import settings
 from app.database import engine
 from app.routers import auth
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    yield
+    async with AsyncPostgresSaver.from_conn_string(settings.CHECKPOINTER_DATABASE_URL) as checkpointer:
+        await checkpointer.setup()
+        app.state.checkpointer = checkpointer
+        yield
     await engine.dispose()
 
 app = FastAPI(
