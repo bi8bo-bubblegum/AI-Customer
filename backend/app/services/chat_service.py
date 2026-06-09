@@ -6,14 +6,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.graph import build_graph
 from app.repositories.message_repo import MessageRepo
-from app.schemas.chat import SSETokenEvent, SSEToolResultEvent, SSEToolCallEvent, SSEDoneEvent
+from app.schemas.chat import SSETokenEvent, SSEToolResultEvent, SSEToolCallEvent, SSEDoneEvent, MessageResponse
 
 
 class ChatService:
 
     @staticmethod
     async def get_messages(db: AsyncSession, user_id: str, limit: int = 50, offset: int = 0):
-        return await MessageRepo.get_by_user(db, user_id, limit, offset)
+        messages = await MessageRepo.get_by_user(db, user_id, limit, offset)
+        return [MessageResponse.model_validate(msg) for msg in messages]
 
     @staticmethod
     async def clear_history(db: AsyncSession, user_id: str):
