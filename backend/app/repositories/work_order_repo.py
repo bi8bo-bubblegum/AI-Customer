@@ -8,7 +8,7 @@ class WorkOrderRepo:
     async def create(db: AsyncSession, **kwargs) -> WorkOrder:
         order = WorkOrder(**kwargs)
         db.add(order)
-        await db.refresh(order)
+        await db.flush(order)
         return order
 
     @staticmethod
@@ -40,5 +40,5 @@ class WorkOrderRepo:
             for key, value in kwargs.items():
                 if value is not None:
                     setattr(order, key, value)
-            await db.refresh(order)
+            await db.flush(order)
         return order

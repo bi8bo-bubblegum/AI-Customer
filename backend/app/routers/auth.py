@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.common.dependencies import get_current_user
 from app.common.response import success
 from app.database import get_db
+from app.models.user import User
 from app.schemas.user import RegisterRequest, LoginRequest, UserResponse
 from app.services.auth_service import AuthService
 
@@ -25,6 +26,6 @@ async def refresh(refresh_token: str, db: AsyncSession = Depends(get_db)):
     return success(data=token.model_dump(), message='刷新成功')
 
 @router.get('/me')
-async def me(db: AsyncSession = Depends(get_db), current_user: str = Depends(get_current_user)):
+async def me(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     return success(data=UserResponse.model_validate(current_user).model_dump())
 

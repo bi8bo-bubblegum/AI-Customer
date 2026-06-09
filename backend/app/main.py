@@ -17,8 +17,10 @@ async def lifespan(app: FastAPI):
     async with AsyncPostgresSaver.from_conn_string(settings.CHECKPOINTER_DATABASE_URL) as checkpointer:
         await checkpointer.setup()
         app.state.checkpointer = checkpointer
-        yield
-    await engine.dispose()
+        try:
+            yield
+        finally:
+            await engine.dispose()
 
 app = FastAPI(
     title='AI-Customer 道路客运 AI 客服',

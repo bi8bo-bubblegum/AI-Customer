@@ -1,10 +1,9 @@
 import os
-import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from langchain_openai import OpenAIEmbeddings
 from app.repositories.knowledge_repo import KnowledgeDocumentRepo, KnowledgeChunkRepo
 from app.utils.pdf_parser import extract_text_from_pdf, split_text
-from app.models.knowledge import KnowledgeChunk
+from app.models.knowledge import KnowledgeChunk, KnowledgeDocument
 from app.config import settings
 
 # 延迟初始化 Embedding 模型
@@ -40,14 +39,14 @@ class KnowledgeService:
         embedding_vectors = await embeddings.aembed_documents(texts)
 
         # 4. 保存文档记录
-        doc_record = await KnowledgeDocumentRepo.create(
-            db,
+        doc_record = KnowledgeDocument(
             title=title,
             file_name=file_name,
             file_path=file_path,
             uploaded_by=user_id,
             chunk_count=len(docs),
         )
+        doc_record = await KnowledgeDocumentRepo.create(db, doc_record)
 
         # 5. 保存切片
         chunks = []

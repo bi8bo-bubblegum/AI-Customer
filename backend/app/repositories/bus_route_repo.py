@@ -68,8 +68,6 @@ class BusScheduleRepo:
     async def search_schedules(
         db: AsyncSession,
         route_id: str = None,
-        departure: str = None,
-        destination: str = None,
         weekday: int = None,
         time_after: str = None,
         time_before: str = None,
@@ -106,5 +104,6 @@ class BusScheduleRepo:
             schedule.operating_days = data.operating_days
             schedule.is_active = data.is_active
             await db.flush()
+        return schedule
 
 

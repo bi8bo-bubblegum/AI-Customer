@@ -5,6 +5,7 @@ from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.graph import build_graph
+from app.models import Message
 from app.repositories.message_repo import MessageRepo
 from app.schemas.chat import SSETokenEvent, SSEToolResultEvent, SSEToolCallEvent, SSEDoneEvent, MessageResponse
 
@@ -23,7 +24,13 @@ class ChatService:
 
     @staticmethod
     async def save_message(db: AsyncSession, user_id: str, role: str, content: str, agent_type: str = None):
-        return await MessageRepo.create(db, user_id, role, content, agent_type)
+        message = Message(
+            user_id=user_id,
+            role=role,
+            content=content,
+            agent_type=agent_type
+        )
+        return await MessageRepo.create(db, message)
 
     @staticmethod
     async def stream_chat(
